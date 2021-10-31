@@ -8,23 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		6F31E41A272996650081EAC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F31E419272996650081EAC2 /* AppDelegate.swift */; };
-		6F31E41C272996650081EAC2 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F31E41B272996650081EAC2 /* GameViewController.swift */; };
+		6F31E41C272996650081EAC2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F31E41B272996650081EAC2 /* ViewController.swift */; };
 		6F31E41E272996650081EAC2 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F31E41D272996650081EAC2 /* Renderer.swift */; };
 		6F31E420272996650081EAC2 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = 6F31E41F272996650081EAC2 /* Shaders.metal */; };
 		6F31E423272996670081EAC2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F31E422272996670081EAC2 /* Assets.xcassets */; };
 		6F31E426272996670081EAC2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6F31E424272996670081EAC2 /* Main.storyboard */; };
+		6F31E43427299EA10081EAC2 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F31E43327299EA10081EAC2 /* Camera.swift */; };
+		6F31E4382729A0B00081EAC2 /* AAPLMathUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F31E43527299F220081EAC2 /* AAPLMathUtilities.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6F31E416272996650081EAC2 /* TemplateTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TemplateTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F31E416272996650081EAC2 /* MTLTemplate3D.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MTLTemplate3D.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F31E419272996650081EAC2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		6F31E41B272996650081EAC2 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
+		6F31E41B272996650081EAC2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		6F31E41D272996650081EAC2 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		6F31E41F272996650081EAC2 /* Shaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
-		6F31E421272996650081EAC2 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		6F31E421272996650081EAC2 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		6F31E422272996670081EAC2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6F31E425272996670081EAC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		6F31E427272996670081EAC2 /* TemplateTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TemplateTest.entitlements; sourceTree = "<group>"; };
+		6F31E427272996670081EAC2 /* MTLTemplate3D.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MTLTemplate3D.entitlements; sourceTree = "<group>"; };
+		6F31E43327299EA10081EAC2 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
+		6F31E43527299F220081EAC2 /* AAPLMathUtilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AAPLMathUtilities.m; sourceTree = "<group>"; };
+		6F31E43727299F3F0081EAC2 /* APPLMathUtilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APPLMathUtilities.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,7 +46,7 @@
 		6F31E40D272996640081EAC2 = {
 			isa = PBXGroup;
 			children = (
-				6F31E418272996650081EAC2 /* TemplateTest */,
+				6F31E418272996650081EAC2 /* MTLTemplate3D */,
 				6F31E417272996650081EAC2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -49,32 +54,35 @@
 		6F31E417272996650081EAC2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6F31E416272996650081EAC2 /* TemplateTest.app */,
+				6F31E416272996650081EAC2 /* MTLTemplate3D.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		6F31E418272996650081EAC2 /* TemplateTest */ = {
+		6F31E418272996650081EAC2 /* MTLTemplate3D */ = {
 			isa = PBXGroup;
 			children = (
 				6F31E419272996650081EAC2 /* AppDelegate.swift */,
-				6F31E41B272996650081EAC2 /* GameViewController.swift */,
+				6F31E41B272996650081EAC2 /* ViewController.swift */,
 				6F31E41D272996650081EAC2 /* Renderer.swift */,
+				6F31E43327299EA10081EAC2 /* Camera.swift */,
 				6F31E41F272996650081EAC2 /* Shaders.metal */,
-				6F31E421272996650081EAC2 /* ShaderTypes.h */,
+				6F31E43727299F3F0081EAC2 /* APPLMathUtilities.h */,
+				6F31E43527299F220081EAC2 /* AAPLMathUtilities.m */,
 				6F31E422272996670081EAC2 /* Assets.xcassets */,
 				6F31E424272996670081EAC2 /* Main.storyboard */,
-				6F31E427272996670081EAC2 /* TemplateTest.entitlements */,
+				6F31E427272996670081EAC2 /* MTLTemplate3D.entitlements */,
+				6F31E421272996650081EAC2 /* BridgingHeader.h */,
 			);
-			path = TemplateTest;
+			path = MTLTemplate3D;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6F31E415272996650081EAC2 /* TemplateTest */ = {
+		6F31E415272996650081EAC2 /* MTLTemplate3D */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6F31E42A272996670081EAC2 /* Build configuration list for PBXNativeTarget "TemplateTest" */;
+			buildConfigurationList = 6F31E42A272996670081EAC2 /* Build configuration list for PBXNativeTarget "MTLTemplate3D" */;
 			buildPhases = (
 				6F31E412272996650081EAC2 /* Sources */,
 				6F31E413272996650081EAC2 /* Frameworks */,
@@ -84,9 +92,9 @@
 			);
 			dependencies = (
 			);
-			name = TemplateTest;
+			name = MTLTemplate3D;
 			productName = TemplateTest;
-			productReference = 6F31E416272996650081EAC2 /* TemplateTest.app */;
+			productReference = 6F31E416272996650081EAC2 /* MTLTemplate3D.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -104,7 +112,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6F31E411272996640081EAC2 /* Build configuration list for PBXProject "TemplateTest" */;
+			buildConfigurationList = 6F31E411272996640081EAC2 /* Build configuration list for PBXProject "MTLTemplate3D" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -117,7 +125,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6F31E415272996650081EAC2 /* TemplateTest */,
+				6F31E415272996650081EAC2 /* MTLTemplate3D */,
 			);
 		};
 /* End PBXProject section */
@@ -139,8 +147,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F31E4382729A0B00081EAC2 /* AAPLMathUtilities.m in Sources */,
 				6F31E420272996650081EAC2 /* Shaders.metal in Sources */,
-				6F31E41C272996650081EAC2 /* GameViewController.swift in Sources */,
+				6F31E43427299EA10081EAC2 /* Camera.swift in Sources */,
+				6F31E41C272996650081EAC2 /* ViewController.swift in Sources */,
 				6F31E41E272996650081EAC2 /* Renderer.swift in Sources */,
 				6F31E41A272996650081EAC2 /* AppDelegate.swift in Sources */,
 			);
@@ -280,7 +290,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = TemplateTest/TemplateTest.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MTLTemplate3D/MTLTemplate3D.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -295,10 +305,10 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.Roe-Co.TemplateTest";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Roe-Co.MTLTemplate3D";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/ShaderTypes.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/BridgingHeader.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -308,7 +318,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = TemplateTest/TemplateTest.entitlements;
+				CODE_SIGN_ENTITLEMENTS = MTLTemplate3D/MTLTemplate3D.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -323,10 +333,10 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.Roe-Co.TemplateTest";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Roe-Co.MTLTemplate3D";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/ShaderTypes.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/BridgingHeader.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -334,7 +344,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6F31E411272996640081EAC2 /* Build configuration list for PBXProject "TemplateTest" */ = {
+		6F31E411272996640081EAC2 /* Build configuration list for PBXProject "MTLTemplate3D" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6F31E428272996670081EAC2 /* Debug */,
@@ -343,7 +353,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6F31E42A272996670081EAC2 /* Build configuration list for PBXNativeTarget "TemplateTest" */ = {
+		6F31E42A272996670081EAC2 /* Build configuration list for PBXNativeTarget "MTLTemplate3D" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6F31E42B272996670081EAC2 /* Debug */,

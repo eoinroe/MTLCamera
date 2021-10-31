@@ -10,10 +10,27 @@
 #include <metal_stdlib>
 #include <simd/simd.h>
 
-// Including header shared between this Metal shader code and Swift/C code executing Metal API commands
-#import "ShaderTypes.h"
-
 using namespace metal;
+
+enum {
+    VertexAttributePosition,
+    VertexAttributeTexcoord
+};
+
+enum {
+    BufferIndexMeshPositions,
+    BufferIndexMeshGenerics,
+    BufferIndexUniforms
+};
+
+enum {
+    TextureIndexColor
+};
+
+struct Uniforms {
+    float4x4 projectionMatrix;
+    float4x4 modelViewMatrix;
+};
 
 typedef struct
 {
@@ -43,11 +60,23 @@ fragment float4 fragmentShader(ColorInOut in [[stage_in]],
                                constant Uniforms & uniforms [[ buffer(BufferIndexUniforms) ]],
                                texture2d<half> colorMap     [[ texture(TextureIndexColor) ]])
 {
+    /*
     constexpr sampler colorSampler(mip_filter::linear,
                                    mag_filter::linear,
                                    min_filter::linear);
 
     half4 colorSample   = colorMap.sample(colorSampler, in.texCoord.xy);
-
     return float4(colorSample);
+     */
+    
+    float2 uv = in.texCoord.xy;
+    
+    // float r = uv.x;
+    // float g = 1.0 - uv.y;
+    // float b = 1.0 - uv.x;
+    //
+    // return float4(r*r, g*g, b*b, 1.0);
+    
+    float3 color = mix(mix(float3(0, 0, 1), float3(1, 0, 0), uv.x), float3(0, 1, 0), uv.y);
+    return float4(color, 1.0);
 }

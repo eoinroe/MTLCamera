@@ -11,6 +11,26 @@ import Metal
 import MetalKit
 import simd
 
+enum VertexAttribute: Int {
+    case position
+    case texcoord
+}
+
+enum BufferIndex: Int {
+    case meshPositions
+    case meshGenerics
+    case uniforms
+}
+
+enum TextureIndex: Int {
+    case color
+}
+
+struct Uniforms {
+    var projectionMatrix: float4x4
+    var modelViewMatrix: float4x4
+}
+
 // The 256 byte aligned size of our uniform structure
 let alignedUniformsSize = (MemoryLayout<Uniforms>.size + 0xFF) & -0x100
 
@@ -42,6 +62,16 @@ class Renderer: NSObject, MTKViewDelegate {
     var rotation: Float = 0
 
     var mesh: MTKMesh
+    
+    var camera = Camera()
+    var cameraDistanceFromCenter = SIMD3<Float>(0.0, 0.0, -8.0)
+    
+    enum CoordinateSystem {
+        case leftHanded
+        case rightHanded
+    }
+    
+    var coordinateSystem = CoordinateSystem.leftHanded
 
     init?(metalKitView: MTKView) {
         self.device = metalKitView.device!
@@ -149,11 +179,20 @@ class Renderer: NSObject, MTKViewDelegate {
 
         let metalAllocator = MTKMeshBufferAllocator(device: device)
 
-        let mdlMesh = MDLMesh.newBox(withDimensions: SIMD3<Float>(4, 4, 4),
-                                     segments: SIMD3<UInt32>(2, 2, 2),
-                                     geometryType: MDLGeometryType.triangles,
-                                     inwardNormals:false,
-                                     allocator: metalAllocator)
+        /*
+        
+        var mdlMesh = MDLMesh.newBox(withDimensions: SIMD3<Float>(4, 4, 4),
+                                      segments: SIMD3<UInt32>(2, 2, 2),
+                                      geometryType: MDLGeometryType.triangles,
+                                      inwardNormals:false,
+                                      allocator: metalAllocator)
+         
+         */
+        
+        let mdlMesh = MDLMesh.newPlane(withDimensions: vector_float2(repeating: 5.0),
+                                       segments: vector_uint2(repeating: 20),
+                                       geometryType: .points,
+                                       allocator: metalAllocator)
 
         let mdlVertexDescriptor = MTKModelIOVertexDescriptorFromMetal(mtlVertexDescriptor)
 
@@ -196,15 +235,86 @@ class Renderer: NSObject, MTKViewDelegate {
         uniforms = UnsafeMutableRawPointer(dynamicUniformBuffer.contents() + uniformBufferOffset).bindMemory(to:Uniforms.self, capacity:1)
     }
 
-    private func updateGameState() {
+    private func rotateCamera() -> () {
+        /// Update any game state before rendering
+        uniforms[0].projectionMatrix = projectionMatrix
+
+        let rotationAxis = SIMD3<Float>(1, 1, 0)
+        
+        let sceneCenter = SIMD3<Float>(repeating: 0.0)
+        camera.target   = sceneCenter
+
+        let rotationMatrix = matrix3x3_rotation (camera.rotation,  rotationAxis);
+        camera.rotation += 0.01
+
+        camera.position = sceneCenter
+        camera.position += matrix_multiply (rotationMatrix, cameraDistanceFromCenter)
+        
+        let modelMatrix = matrix4x4_identity()
+        
+        func getViewMatrix() -> float4x4 {
+            switch (coordinateSystem) {
+            case .leftHanded:
+                return camera.getViewMatrix_LH()
+            case .rightHanded:
+                return camera.getViewMatrix_RH()
+            }
+        }
+        
+        uniforms[0].modelViewMatrix = simd_mul(getViewMatrix(), modelMatrix)
+    }
+    
+    /*
+    
+    private func rotateCamera()  {
+        /// Update any game state before rendering
+        uniforms[0].projectionMatrix = projectionMatrix
+
+        let rotationAxis = SIMD3<Float>(1, 1, 0)
+        
+        let sceneCenter = SIMD3<Float>(repeating: 0.0)
+        camera.target   = sceneCenter
+
+        let rotationMatrix = matrix3x3_rotation (camera.rotation,  rotationAxis);
+        camera.rotation += 0.01
+
+        camera.position = sceneCenter
+        camera.position += matrix_multiply (rotationMatrix, cameraDistanceFromCenter)
+        
+        let modelMatrix = matrix4x4_identity()
+        
+        var viewMatrix: float4x4 {
+            switch (coordinateSystem) {
+            case .leftHanded:
+                return camera.getViewMatrix_LH()
+            case .rightHanded:
+                return camera.getViewMatrix_RH()
+            }
+        }
+        
+        uniforms[0].modelViewMatrix = simd_mul(viewMatrix, modelMatrix)
+    }
+     
+     */
+    
+    private func updateGameState() -> () {
         /// Update any game state before rendering
 
         uniforms[0].projectionMatrix = projectionMatrix
 
         let rotationAxis = SIMD3<Float>(1, 1, 0)
-        let modelMatrix = matrix4x4_rotation(radians: rotation, axis: rotationAxis)
-        let viewMatrix = matrix4x4_translation(0.0, 0.0, -8.0)
-        uniforms[0].modelViewMatrix = simd_mul(viewMatrix, modelMatrix)
+        let modelMatrix = matrix4x4_rotation(rotation, rotationAxis)
+        
+        func getViewMatrix() -> float4x4 {
+            switch (coordinateSystem) {
+            case .leftHanded:
+                return camera.getViewMatrix_LH()
+            case .rightHanded:
+                return camera.getViewMatrix_RH()
+            }
+        }
+        
+        uniforms[0].modelViewMatrix = simd_mul(getViewMatrix(), modelMatrix)
         rotation += 0.01
     }
 
@@ -222,6 +332,7 @@ class Renderer: NSObject, MTKViewDelegate {
             self.updateDynamicBufferState()
             
             self.updateGameState()
+            // self.rotateCamera()
             
             /// Delay getting the currentRenderPassDescriptor until we absolutely need it to avoid
             ///   holding onto the drawable and blocking the display pipeline any longer than necessary
@@ -235,9 +346,29 @@ class Renderer: NSObject, MTKViewDelegate {
                     
                     renderEncoder.pushDebugGroup("Draw Box")
                     
-                    renderEncoder.setCullMode(.back)
+                    renderEncoder.setCullMode(.none)
+                    renderEncoder.setTriangleFillMode(.lines)
                     
-                    renderEncoder.setFrontFacing(.counterClockwise)
+                    /*
+                     https://docs.microsoft.com/en-us/previous-versions/windows/desktop/bb324490(v=vs.85)
+                     
+                     Microsoft Direct3D uses a left-handed coordinate system. If you are porting an application
+                     that is based on a right-handed coordinate system, you must make two changes to the data
+                     passed to Direct3D.
+
+                     Flip the order of triangle vertices so that the system traverses them clockwise from the
+                     front. In other words, if the vertices are v0, v1, v2, pass them to Direct3D as v0, v2, v1.
+                     Use the view matrix to scale world space by -1 in the z direction. To do this, flip the sign
+                     of the M31, M32, M33, and M34 fields of the Matrix structure that you use for your view matrix.
+                     
+                     */
+                    
+                    switch (coordinateSystem) {
+                    case .leftHanded:
+                        renderEncoder.setFrontFacing(.clockwise)
+                    case .rightHanded:
+                        renderEncoder.setFrontFacing(.counterClockwise)
+                    }
                     
                     renderEncoder.setRenderPipelineState(pipelineState)
                     
@@ -247,11 +378,14 @@ class Renderer: NSObject, MTKViewDelegate {
                     renderEncoder.setFragmentBuffer(dynamicUniformBuffer, offset:uniformBufferOffset, index: BufferIndex.uniforms.rawValue)
                     
                     for (index, element) in mesh.vertexDescriptor.layouts.enumerated() {
+                        
+                        
                         guard let layout = element as? MDLVertexBufferLayout else {
                             return
                         }
                         
                         if layout.stride != 0 {
+                            
                             let buffer = mesh.vertexBuffers[index]
                             renderEncoder.setVertexBuffer(buffer.buffer, offset:buffer.offset, index: index)
                         }
@@ -286,40 +420,7 @@ class Renderer: NSObject, MTKViewDelegate {
         /// Respond to drawable size or orientation changes here
 
         let aspect = Float(size.width) / Float(size.height)
-        projectionMatrix = matrix_perspective_right_hand(fovyRadians: radians_from_degrees(65), aspectRatio:aspect, nearZ: 0.1, farZ: 100.0)
+        // projectionMatrix = matrix_perspective_right_hand(radians_from_degrees(65), aspect, 0.1, 100.0)
+        projectionMatrix = matrix_perspective_left_hand(radians_from_degrees(65), aspect, 0.1, 100.0)
     }
-}
-
-// Generic matrix math utility functions
-func matrix4x4_rotation(radians: Float, axis: SIMD3<Float>) -> matrix_float4x4 {
-    let unitAxis = normalize(axis)
-    let ct = cosf(radians)
-    let st = sinf(radians)
-    let ci = 1 - ct
-    let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
-    return matrix_float4x4.init(columns:(vector_float4(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st, 0),
-                                         vector_float4(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st, 0),
-                                         vector_float4(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci, 0),
-                                         vector_float4(                  0,                   0,                   0, 1)))
-}
-
-func matrix4x4_translation(_ translationX: Float, _ translationY: Float, _ translationZ: Float) -> matrix_float4x4 {
-    return matrix_float4x4.init(columns:(vector_float4(1, 0, 0, 0),
-                                         vector_float4(0, 1, 0, 0),
-                                         vector_float4(0, 0, 1, 0),
-                                         vector_float4(translationX, translationY, translationZ, 1)))
-}
-
-func matrix_perspective_right_hand(fovyRadians fovy: Float, aspectRatio: Float, nearZ: Float, farZ: Float) -> matrix_float4x4 {
-    let ys = 1 / tanf(fovy * 0.5)
-    let xs = ys / aspectRatio
-    let zs = farZ / (nearZ - farZ)
-    return matrix_float4x4.init(columns:(vector_float4(xs,  0, 0,   0),
-                                         vector_float4( 0, ys, 0,   0),
-                                         vector_float4( 0,  0, zs, -1),
-                                         vector_float4( 0,  0, zs * nearZ, 0)))
-}
-
-func radians_from_degrees(_ degrees: Float) -> Float {
-    return (degrees / 180) * .pi
 }
